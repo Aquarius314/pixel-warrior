@@ -22,8 +22,8 @@ class Missile:
             if game.engine.check_collisions(self, game.colliding_rects):
                 self.active = False
 
-    def get_collider(self):
-        return Collider((self.x, self.y), (6, 6), is_circle=True)
+    def get_colliders(self):
+        return [Collider((self.x, self.y), (6, 6), is_circle=True)]
 
     def display(self, screen, assets):
         if self.active:

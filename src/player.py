@@ -40,9 +40,21 @@ class Player:
         self.start_position = x, y
         self.previous_position = x, y
         self.reset_stats()
-        self.collider = Collider(self.position, self.size)
+        self.colliders = self._setup_colliders()
         self.parent = parent
         self.interface = Interface(self)
+
+    def _setup_colliders(self):
+        c1x, c1y = self.position
+        c2x, c2y = self.position
+        c1x += int(self.size[0]/2)
+        c1y += int(self.size[1]/3)
+        collider1 = Collider((c1x, c1y), (int(2*self.size[0]/3), int(2*self.size[1]/3)), is_circle=True)
+        c2x += 10
+        c2y += int(self.size[1]/3)
+        collider2 = Collider((int(c1x-2-self.size[0]/3), c2y), (3*self.size[0]/4+3, int(2*self.size[1]/3)))
+
+        return [collider1, collider2]
 
     def reset_stats(self):
         self.position = self.start_position
@@ -55,9 +67,8 @@ class Player:
         self.fire_rate = 0.5
         self.vertical_speed = 0
 
-    def get_collider(self):
-        self.collider.position = self.position
-        return self.collider
+    def get_colliders(self):
+        return self._setup_colliders()
 
     def display(self, screen, assets):
         x, y = self.position

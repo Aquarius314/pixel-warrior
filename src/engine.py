@@ -9,6 +9,7 @@ class Engine:
 
     def check_collisions(self, body, colliders):
         for collider in colliders:
-            if body.get_collider().collides_with(collider):
-                return True
+            for body_collider in body.get_colliders():
+                if body_collider.collides_with(collider):
+                    return True
         body.apply_gravity(self.gravity, self.MAX_GRAVITY)
