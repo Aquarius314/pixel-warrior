@@ -23,10 +23,11 @@ class Player:
 
     def __init__(self, x, y, parent):
         self.position = x, y
+        self.size = 40, 60
         self.start_position = x, y
         self.previous_position = x, y
         self.reset_stats()
-        self.collider = Collider(self.position, (40, 40), is_circle=True)
+        self.collider = Collider(self.position, self.size)
         self.parent = parent
 
     def get_collider(self):
@@ -45,7 +46,8 @@ class Player:
 
     def display(self, screen):
         x, y = self.position
-        pygame.draw.circle(screen, self.color, (int(x), int(y)), 20)
+        # pygame.draw.circle(screen, self.color, (int(x), int(y)), 20)
+        pygame.draw.rect(screen, self.color, pygame.Rect(int(x), int(y), self.size[0], self.size[1]))
 
     def move_to(self, position):
         self.position = position
@@ -105,14 +107,3 @@ class Player:
                 self.standing = True
             else:
                 self.standing = False
-    #
-    # def define_state(self):
-    #     x, y = self.position
-    #     px, py = self.previous_position
-    #     if x < px:
-    #         self.color = (255, 0, 0)
-    #     elif x > px:
-    #         self.color = (0, 255, 0)
-    #     else:
-    #         self.color = (0, 0, 255)
-

@@ -21,11 +21,12 @@ class Collider:
             self.radius = 0
 
     def display(self, screen):
+        x, y = int(self.position[0]), int(self.position[1])
         if self.is_circle:
-            pygame.draw.circle(screen, (0, 250, 0), self.position, int(self.radius), 1)
+            pygame.draw.circle(screen, (0, 250, 0), (x, y), int(self.radius), 1)
         else:
             pygame.draw.rect(screen, (0, 250, 0), pygame.Rect(
-                self.position[0], self.position[1], self.size[0], self.size[1]
+                x, y, self.size[0], self.size[1]
             ), 1)
 
     def collides_with(self, collider):
@@ -56,14 +57,35 @@ class Collider:
             return rx - circle.radius <= cx <= rx + rwidth + circle.radius
 
         # by corners
-        corners = [(rx, ry),
-                   (rx + rwidth, ry),
-                   (rx, ry + rheight),
-                   (rx + rwidth, ry + rheight)]
+        corners = collider.get_corners()
         for corner in corners:
             if distance(corner, circle.position) <= circle.radius:
                 return True
 
-    def _check_rectangle_with_rectangle(self, collider):
-        print("RECTANGLE WITH RECTANGLE NOT YET IMPLEMENTED!")
-        pass
+    def _check_rectangle_with_rectangle(self, rect1, rect2):
+        corners1 = rect1.get_corners()
+        corners2 = rect2.get_corners()
+        for corner1 in corners1:
+            if rect2.contains_corner(corner1):
+                return True
+        for corner2 in corners2:
+            if rect1.contains_corner(corner2):
+                return True
+        return False
+
+    def get_corners(self):
+        if self.is_circle:
+            print("NO CORNERS AVAILABLE FOR CIRCLE COLLIDERS!")
+        else:
+            x, y = self.position
+            width, height = self.size
+            return [(x, y), 
+                    (x + width, y), 
+                    (x, y + height), 
+                    (x + width, y + height)]
+
+    def contains_corner(self, corner):
+        cx, cy = corner
+        rx, ry = self.position
+        rwidth, rheight = self.size
+        return rx <= cx <= rx + rwidth and ry <= cy <= ry + rheight
