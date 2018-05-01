@@ -13,7 +13,7 @@ class Player:
     MAX_MANA = 100
     MAX_EXP = 100
 
-    HEALTH_LOSS_RATE = 0.01
+    HEALTH_LOSS_RATE = 0.02
     MANA_GAIN_RATE = 0.04
     MANA_SPELL_COST = 10
 
@@ -21,6 +21,7 @@ class Player:
     health = 0
     mana = 0
     experience = 0
+    money = 0
     level = 0
     speed = 0
     jump_speed = 0
@@ -61,6 +62,7 @@ class Player:
         self.health = self.MAX_HEALTH
         self.mana = self.MAX_MANA/2
         self.experience = 0
+        self.money = 0
         self.speed = 4
         self.jump_speed = 10
         self.level = 1
@@ -154,8 +156,17 @@ class Player:
     def actions(self, game):
         self.gravity()
         self._modify_stats()
+        self._move_missiles(game)
+
+    def _move_missiles(self, game):
+        inactive_missiles = []
         for missile in self.missiles:
             missile.actions(game)
+            if not missile.active:
+                inactive_missiles.append(missile)
+        for missile in inactive_missiles:
+            if missile in self.missiles:
+                self.missiles.remove(missile)
 
     def _modify_stats(self):
         self.health -= self.HEALTH_LOSS_RATE
@@ -172,3 +183,12 @@ class Player:
                 self.standing = True
             else:
                 self.standing = False
+
+    def add_health(self, value):
+        self.health = min(self.MAX_HEALTH, self.health + value)
+
+    def add_mana(self, value):
+        self.mana = min(self.MAX_MANA, self.mana + value)
+
+    def add_money(self, value):
+        self.money += value

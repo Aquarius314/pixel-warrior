@@ -12,7 +12,7 @@ from collectable import Collectable
 class Game:
 
     colliding_rects = []
-    collectables = [Collectable(320, 280, 10)]
+    collectables = [Collectable(320, 280, 10, 1), Collectable(360, 320, 10, 2)]
     display_optimisation = False
     WALL_COLOR = (180, 220, 180)
     engine = Engine()
@@ -29,8 +29,20 @@ class Game:
         gravity_objects = [self.player]
         for gravity_obj in gravity_objects:
             self.engine.check_collisions(gravity_obj, self.colliding_rects)
+        self.engine.check_collectables(self.player, self.collectables)
         self.controller.apply_key_actions(self.player)
         self.player.actions(self)
+        # remove inactive collectables
+        self.remove_inactive_collectables()
+
+    def remove_inactive_collectables(self):
+        col_to_remove = []
+        for collectable in self.collectables:
+            if not collectable.active:
+                col_to_remove.append(collectable)
+        for collectable in col_to_remove:
+            if collectable in self.collectables:
+                self.collectables.remove(collectable)
 
     def prepare_map(self, map):
         self.colliding_rects += MapPreparator().get_optimised_rects(map)
