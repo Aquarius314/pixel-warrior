@@ -1,7 +1,9 @@
 import pygame
 from collider import Collider
 from engine import Engine
+from missile import Missile
 import math
+import time
 
 
 class Player:
@@ -9,6 +11,7 @@ class Player:
     MAX_HEALTH = 100
     MAX_MANA = 100
 
+    missiles = []
     health = 0
     mana = 0
     experience = 0
@@ -18,6 +21,9 @@ class Player:
     name = "Nameless Warrior"
     vertical_speed = 0
     standing = True
+    direction_left = True
+    last_fire_time = time.time()
+    fire_rate = 0.5
 
     color = (255, 0, 0)
 
@@ -42,12 +48,14 @@ class Player:
         self.jump_speed = 10
         self.experience = 0
         self.level = 1
+        self.fire_rate = 0.5
         self.vertical_speed = 0
 
     def display(self, screen):
         x, y = self.position
-        # pygame.draw.circle(screen, self.color, (int(x), int(y)), 20)
         pygame.draw.rect(screen, self.color, pygame.Rect(int(x), int(y), self.size[0], self.size[1]))
+        for missile in self.missiles:
+            missile.display(screen)
 
     def move_to(self, position):
         self.position = position
@@ -62,6 +70,14 @@ class Player:
             self.position = self.previous_position
             return self.try_smaller_step(x, y)
         return True
+
+    def try_fire(self):
+        if time.time() - self.last_fire_time > self.fire_rate:
+            self.last_fire_time = time.time()
+            self.fire()
+
+    def fire(self):
+        self.missiles.append(Missile(self.position, self.direction_left))
 
     def try_smaller_step(self, x, y):
         if math.fabs(x) > 1 or math.fabs(y) > 1:
@@ -79,10 +95,12 @@ class Player:
     def move_left(self):
         if self.try_move((-self.speed, 0)):
             self.color = (255, 0, 0)
+            self.direction_left = True
 
     def move_right(self):
         if self.try_move((self.speed, 0)):
             self.color = (0, 255, 0)
+            self.direction_left = False
 
     def move_up(self):
         if self.vertical_speed < 4:
@@ -95,9 +113,13 @@ class Player:
     def get_position(self):
         return self.position
 
-    def actions(self):
+    def actions(self, game):
         self.gravity()
-        # self.define_state()
+        for missile in self.missiles:
+            missile.actions(game)
+
+    def apply_gravity(self, gravity, max_gravity):
+        self.vertical_speed = min(self.vertical_speed + gravity, max_gravity)
 
     def gravity(self):
         if self.vertical_speed > 0:

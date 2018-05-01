@@ -36,9 +36,7 @@ class Window:
                 self.running = False
             elif event.type == pygame.KEYDOWN:
                 info = "Window: KeyPressed: "
-                if event.key == pygame.K_SPACE:
-                    info += "SPACE"
-                elif event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE:
                     info += "ESCAPE"
                     self.running = False
                 else:

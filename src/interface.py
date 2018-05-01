@@ -36,3 +36,5 @@ class Interface:
             player.move_down()
         if self.ctrl_pressed:
             player.reset_stats()
+        if self.space_pressed:
+            player.try_fire()

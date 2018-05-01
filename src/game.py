@@ -26,7 +26,7 @@ class Game:
         for gravity_obj in gravity_objects:
             self.engine.check_collisions(gravity_obj, self.colliding_rects)
         self.interface.apply_key_actions(self.player)
-        self.player.actions()
+        self.player.actions(self)
 
     def prepare_map(self, map):
         self.colliding_rects += MapPreparator().get_optimised_rects(map)

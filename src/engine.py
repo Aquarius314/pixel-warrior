@@ -11,4 +11,4 @@ class Engine:
         for collider in colliders:
             if body.get_collider().collides_with(collider):
                 return True
-        body.vertical_speed = min(body.vertical_speed + self.gravity, self.MAX_GRAVITY)
+        body.apply_gravity(self.gravity, self.MAX_GRAVITY)
