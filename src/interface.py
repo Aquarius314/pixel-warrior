@@ -3,38 +3,31 @@ import pygame
 
 class Interface:
 
-    def __init__(self):
-        self.left_pressed = False
-        self.right_pressed = False
-        self.up_pressed = False
-        self.down_pressed = False
-        self.space_pressed = False
-        self.ctrl_pressed = False
+    def __init__(self, player):
+        self.player = player
 
-    def keyevent(self, key, pressed=True):
-        if key == pygame.K_LEFT:
-            self.left_pressed = pressed
-        elif key == pygame.K_RIGHT:
-            self.right_pressed = pressed
-        elif key == pygame.K_UP:
-            self.up_pressed = pressed
-        elif key == pygame.K_DOWN:
-            self.down_pressed = pressed
-        elif key == pygame.K_SPACE:
-            self.space_pressed = pressed
-        elif key == pygame.K_LCTRL:
-            self.ctrl_pressed = pressed
+    def display(self, screen, assets):
+        self._display_stats(screen, assets)
+        # self._display_health(screen, assets)
 
-    def apply_key_actions(self, player):
-        if self.left_pressed:
-            player.move_left()
-        if self.right_pressed:
-            player.move_right()
-        if self.up_pressed:
-            player.move_up()
-        if self.down_pressed:
-            player.move_down()
-        if self.ctrl_pressed:
-            player.reset_stats()
-        if self.space_pressed:
-            player.try_fire()
+    def _display_stats(self, screen, assets):
+        # health
+        pic = assets.get_asset("health")
+        screen.blit(pic, (5, 5))
+        healthbar = int((self.player.health/self.player.MAX_HEALTH)*100)
+        pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(26, 5, 100, 16), 2)
+        pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(26, 5, healthbar, 16))
+
+        # mana
+        pic = assets.get_asset("mana")
+        screen.blit(pic, (5, 26))
+        manabar = int((self.player.mana/self.player.MAX_MANA)*100)
+        pygame.draw.rect(screen, (0, 0, 255), pygame.Rect(26, 26, 100, 16), 2)
+        pygame.draw.rect(screen, (0, 0, 255), pygame.Rect(26, 26, manabar, 16))
+
+        # experience
+        pic = assets.get_asset("exp")
+        screen.blit(pic, (5, 47))
+        expbar = int((self.player.experience/self.player.MAX_EXP)*100)
+        pygame.draw.rect(screen, (255, 160, 0), pygame.Rect(26, 47, 100, 16), 2)
+        pygame.draw.rect(screen, (255, 160, 0), pygame.Rect(26, 47, expbar, 16))

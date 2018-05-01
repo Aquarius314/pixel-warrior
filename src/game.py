@@ -4,7 +4,7 @@ from map_preparator import MapPreparator
 from player import Player
 from engine import Engine
 from collider import Collider
-from interface import Interface
+from controller import Controller
 from assets import Assets
 
 
@@ -14,20 +14,20 @@ class Game:
     display_optimisation = False
     WALL_COLOR = (180, 220, 180)
     engine = Engine()
-    interface = Interface()
+    controller = Controller()
     assets = Assets()
 
     def __init__(self):
         self.level = Level(3)
         self.map = self.prepare_map(self.level.get_map())
         self.level_image = self.level.get_level_image()
-        self.player = Player(0, 0, self)
+        self.player = Player(50, 0, self)
 
     def calculate(self):
         gravity_objects = [self.player]
         for gravity_obj in gravity_objects:
             self.engine.check_collisions(gravity_obj, self.colliding_rects)
-        self.interface.apply_key_actions(self.player)
+        self.controller.apply_key_actions(self.player)
         self.player.actions(self)
 
     def prepare_map(self, map):
@@ -53,9 +53,9 @@ class Game:
         if key == pygame.K_o:
             self.display_optimisation = not self.display_optimisation
         else:
-            self.interface.keyevent(key, pressed=True)
+            self.controller.keyevent(key, pressed=True)
 
     def handle_keyup(self, key):
-        self.interface.keyevent(key, pressed=False)
+        self.controller.keyevent(key, pressed=False)
 
 

@@ -2,6 +2,7 @@ import pygame
 from collider import Collider
 from engine import Engine
 from missile import Missile
+from interface import Interface
 import math
 import time
 
@@ -10,6 +11,11 @@ class Player:
 
     MAX_HEALTH = 100
     MAX_MANA = 100
+    MAX_EXP = 100
+
+    HEALTH_LOSS_RATE = 0.01
+    MANA_GAIN_RATE = 0.04
+    MANA_SPELL_COST = 10
 
     missiles = []
     health = 0
@@ -21,6 +27,7 @@ class Player:
     name = "Nameless Warrior"
     vertical_speed = 0
     standing = True
+    is_casting = False
     direction_left = True
     last_fire_time = time.time()
     fire_rate = 0.5
@@ -35,35 +42,43 @@ class Player:
         self.reset_stats()
         self.collider = Collider(self.position, self.size)
         self.parent = parent
+        self.interface = Interface(self)
+
+    def reset_stats(self):
+        self.position = self.start_position
+        self.health = self.MAX_HEALTH
+        self.mana = self.MAX_MANA/2
+        self.experience = 0
+        self.speed = 4
+        self.jump_speed = 10
+        self.level = 1
+        self.fire_rate = 0.5
+        self.vertical_speed = 0
 
     def get_collider(self):
         self.collider.position = self.position
         return self.collider
 
-    def reset_stats(self):
-        self.position = self.start_position
-        self.health = self.MAX_HEALTH
-        self.mana = self.MAX_MANA
-        self.speed = 4
-        self.jump_speed = 10
-        self.experience = 0
-        self.level = 1
-        self.fire_rate = 0.5
-        self.vertical_speed = 0
-
     def display(self, screen, assets):
         x, y = self.position
-        pic = assets.get_asset(self._choose_asset_name())
+        pic = self._prepare_asset(assets)
         screen.blit(pic, (int(x), int(y)))
 
         for missile in self.missiles:
             missile.display(screen, assets)
 
-    def _choose_asset_name(self):
+        self.interface.display(screen, assets)
+
+    def _prepare_asset(self, assets):
+        pic = assets.get_asset(self._choose_asset_name())
         if self.direction_left:
-            return "player_left"
-        else:
-            return "player_right"
+            pic = pygame.transform.flip(pic, True, False)
+        return pic
+
+    def _choose_asset_name(self):
+        if self.is_casting:
+            return "player_cast"
+        return "player_stand"
 
     def move_to(self, position):
         self.position = position
@@ -80,12 +95,16 @@ class Player:
         return True
 
     def try_fire(self):
-        if time.time() - self.last_fire_time > self.fire_rate:
-            self.last_fire_time = time.time()
-            self.fire()
+        if self.mana >= self.MANA_SPELL_COST:
+            if time.time() - self.last_fire_time > self.fire_rate:
+                self.last_fire_time = time.time()
+                self.fire()
 
     def fire(self):
-        self.missiles.append(Missile(self.position, self.direction_left))
+        self.mana -= self.MANA_SPELL_COST
+        midx = self.position[0] + int(self.size[0]/2)
+        midy = self.position[1] + int(self.size[1]/2)
+        self.missiles.append(Missile((midx, midy), self.direction_left))
 
     def try_smaller_step(self, x, y):
         if math.fabs(x) > 1 or math.fabs(y) > 1:
@@ -123,8 +142,13 @@ class Player:
 
     def actions(self, game):
         self.gravity()
+        self._modify_stats()
         for missile in self.missiles:
             missile.actions(game)
+
+    def _modify_stats(self):
+        self.health -= self.HEALTH_LOSS_RATE
+        self.mana = min(self.MAX_MANA, self.mana + self.MANA_GAIN_RATE)
 
     def apply_gravity(self, gravity, max_gravity):
         self.vertical_speed = min(self.vertical_speed + gravity, max_gravity)
