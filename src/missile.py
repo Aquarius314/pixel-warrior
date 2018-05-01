@@ -25,7 +25,7 @@ class Missile:
     def get_collider(self):
         return Collider((self.x, self.y), (6, 6), is_circle=True)
 
-    def display(self, screen):
+    def display(self, screen, assets):
         if self.active:
             pygame.draw.circle(screen, (255, 0, 0), (int(self.x), int(self.y)), 6)
 

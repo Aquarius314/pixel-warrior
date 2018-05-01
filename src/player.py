@@ -51,11 +51,19 @@ class Player:
         self.fire_rate = 0.5
         self.vertical_speed = 0
 
-    def display(self, screen):
+    def display(self, screen, assets):
         x, y = self.position
-        pygame.draw.rect(screen, self.color, pygame.Rect(int(x), int(y), self.size[0], self.size[1]))
+        pic = assets.get_asset(self._choose_asset_name())
+        screen.blit(pic, (int(x), int(y)))
+
         for missile in self.missiles:
-            missile.display(screen)
+            missile.display(screen, assets)
+
+    def _choose_asset_name(self):
+        if self.direction_left:
+            return "player_left"
+        else:
+            return "player_right"
 
     def move_to(self, position):
         self.position = position

@@ -5,6 +5,7 @@ from player import Player
 from engine import Engine
 from collider import Collider
 from interface import Interface
+from assets import Assets
 
 
 class Game:
@@ -14,6 +15,7 @@ class Game:
     WALL_COLOR = (180, 220, 180)
     engine = Engine()
     interface = Interface()
+    assets = Assets()
 
     def __init__(self):
         self.level = Level(3)
@@ -34,7 +36,7 @@ class Game:
 
     def display_elements(self, screen):
         self.display_map(screen)
-        self.player.display(screen)
+        self.player.display(screen, self.assets)
         if self.display_optimisation:
             self.display_colliding_rects(screen)
 
